@@ -13,6 +13,9 @@ on:
   schedule:
     - cron: "15 11 * * 1-5" # nightly run at 11:15 AM UTC
 
+permissions:
+  contents: read
+
 jobs:
   Build:
     runs-on: ubuntu-latest
@@ -24,6 +27,17 @@ jobs:
 
       - name: Maven Build
         run: mvn install
+
+      - name: Upload Build Artifact (WAR)
+        uses: actions/upload-artifact@v4
+        with:
+          name: vprofile-app
+          path: target/*.war
+
+      - name: Notify if Build Fails
+        if: failure()
+        run: echo "[RED WARRNING] Build job failed! Please check logs."
+
 
   Testing:
     runs-on: ubuntu-latest
